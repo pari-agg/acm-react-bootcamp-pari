@@ -1,0 +1,83 @@
+name: Automated Grading Pipeline
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to compare against base branch for git diff
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Detect Changed Component
+        id: detect
+        run: |
+          # Find the component folder that was modified in this PR
+          # We diff against the base branch of the PR
+          CHANGED_FILE=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '^src/components/' | head -n 1)
+          
+          if [ -z "$CHANGED_FILE" ]; then
+            echo "No component modifications found."
+            echo "HAS_CHANGES=false" >> $GITHUB_ENV
+            exit 0
+          fi
+          
+          # Extract component name from path (e.g., src/components/Button/Button.jsx -> Button)
+          COMPONENT_NAME=$(echo $CHANGED_FILE | awk -F'/' '{print $3}')
+          echo "COMPONENT_NAME=$COMPONENT_NAME" >> $GITHUB_ENV
+          echo "HAS_CHANGES=true" >> $GITHUB_ENV
+          echo "Detected modified component: $COMPONENT_NAME"
+
+      - name: Run Tests (Isolated)
+        if: env.HAS_CHANGES == 'true'
+        run: |
+          # Run tests ONLY for the detected component
+          # We use --reporter=json to output test-results.json for the points script
+          # We use 'continue-on-error' so the grading script can still run even if tests fail
+          npm run test:ci src/components/$COMPONENT_NAME || true
+
+      - name: Get Commit Time
+        if: env.HAS_CHANGES == 'true'
+        run: |
+          # Get the timestamp of the latest commit in ISO 8601 format
+          COMMIT_TIME=$(git log -1 --format=%cI)
+          echo "COMMIT_TIME=$COMMIT_TIME" >> $GITHUB_ENV
+
+      - name: Determine First Push
+        if: env.HAS_CHANGES == 'true'
+        run: |
+          # If the event action is 'opened', it's the first push of the PR
+          if [ "${{ github.event.action }}" == "opened" ]; then
+            echo "IS_FIRST_PUSH=true" >> $GITHUB_ENV
+          else
+            echo "IS_FIRST_PUSH=false" >> $GITHUB_ENV
+          fi
+
+      - name: Calculate Points
+        if: env.HAS_CHANGES == 'true'
+        run: npm run calculate-points
+
+      - name: Post PR Comment
+        if: env.HAS_CHANGES == 'true'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: grading-report
+          path: points-summary.md

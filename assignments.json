@@ -1,0 +1,58 @@
+{
+  "Button": {
+    "day": 1,
+    "assignedDate": "2026-06-01"
+  },
+  "Input": {
+    "day": 2,
+    "assignedDate": "2026-06-02"
+  },
+  "Card": {
+    "day": 3,
+    "assignedDate": "2026-06-03"
+  },
+  "Badge": {
+    "day": 4,
+    "assignedDate": "2026-06-04"
+  },
+  "Avatar": {
+    "day": 5,
+    "assignedDate": "2026-06-05"
+  },
+  "ToggleSwitch": {
+    "day": 6,
+    "assignedDate": "2026-06-06"
+  },
+  "Tooltip": {
+    "day": 7,
+    "assignedDate": "2026-06-07"
+  },
+  "Modal": {
+    "day": 8,
+    "assignedDate": "2026-06-08"
+  },
+  "Accordion": {
+    "day": 9,
+    "assignedDate": "2026-06-09"
+  },
+  "Tabs": {
+    "day": 10,
+    "assignedDate": "2026-06-10"
+  },
+  "Toast": {
+    "day": 11,
+    "assignedDate": "2026-06-11"
+  },
+  "Dropdown": {
+    "day": 12,
+    "assignedDate": "2026-06-12"
+  },
+  "Carousel": {
+    "day": 13,
+    "assignedDate": "2026-06-13"
+  },
+  "DataTable": {
+    "day": 14,
+    "assignedDate": "2026-06-14"
+  }
+}
