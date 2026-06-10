@@ -1,1 +1,50 @@
-/* Add ToggleSwitch styles here */
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Hide checkbox visually but keep accessibility */
+.sr-only {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  background-color: #ccc;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+/* Checked styles */
+.sr-only:checked + .switch-slider {
+  background-color: #34c759;
+}
+
+.sr-only:checked + .switch-slider .switch-thumb {
+  transform: translateX(22px);
+}
+
+/* Disabled styles */
+.sr-only:disabled + .switch-slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
